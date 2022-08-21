@@ -27,12 +27,10 @@ namespace LmpCommon.Message.Base
         {
             [0] = typeof(T)
         };
-
         /// <summary>
         ///     Message type. Max message types are 65535
         /// </summary>
         protected abstract ushort MessageTypeId { get; }
-
         /// <summary>
         ///     This parameter can be used to specify a channel for the lidgren delivery methods that preserve order
         ///     (whether by holding back, or dropping messages received out of order).

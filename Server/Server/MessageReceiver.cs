@@ -9,6 +9,7 @@ using Server.Log;
 using Server.Message;
 using Server.Message.Base;
 using Server.Plugin;
+using Server.DiscordBot;
 using System;
 using System.Collections.Generic;
 
@@ -43,36 +44,30 @@ namespace Server.Server
         };
 
         #endregion
-
         public void ReceiveCallback(ClientStructure client, NetIncomingMessage msg)
         {
             if (client == null || msg.LengthBytes <= 1) return;
-
             if (client.ConnectionStatus == ConnectionStatus.Connected)
                 client.LastReceiveTime = ServerContext.ServerClock.ElapsedMilliseconds;
-
             var message = DeserializeMessage(msg);
             if (message == null) return;
-
             LmpPluginHandler.FireOnMessageReceived(client, message);
-            //A plugin has handled this message and requested suppression of the default behavior
+            // A plugin has handled this message and requested suppression of the default behavior
             if (message.Handled) return;
-
             if (message.VersionMismatch)
             {
                 MessageQueuer.SendConnectionEnd(client, $"Version mismatch: Your version ({message.Data.MajorVersion}.{message.Data.MinorVersion}.{message.Data.BuildVersion}) " +
                                                         $"does not match the server version: {LmpVersioning.CurrentVersion}.");
+                
                 return;
             }
-
-            //Clients can only send HANDSHAKE until they are Authenticated.
+            // Clients can only send HANDSHAKE until they are Authenticated.
             if (!client.Authenticated && message.MessageType != ClientMessageType.Handshake)
             {
                 MessageQueuer.SendConnectionEnd(client, $"You must authenticate before sending a {message.MessageType} message");
                 return;
             }
-
-            //Handle the message
+            // Handle the message
             try
             {
                 HandlerDictionary[message.MessageType].HandleMessage(client, message);

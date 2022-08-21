@@ -5,6 +5,7 @@ using Server.Client;
 using Server.Log;
 using Server.Message.Base;
 using Server.Server;
+using Server.DiscordBot;
 
 namespace Server.Message
 {
@@ -14,13 +15,13 @@ namespace Server.Message
         {
             var messageData = (ChatMsgData)message.Data;
             if (messageData.From != client.PlayerName) return;
-
             if (messageData.Relay)
             {
                 MessageQueuer.SendToAllClients<ChatSrvMsg>(messageData);
-                LunaLog.ChatMessage($"{messageData.From}: {messageData.Text}");
+                LunaLog.ChatMessage($"[KSP Chat] {messageData.From}: {messageData.Text}");
+                DiscordClient.SendMessageToDiscordAsync($"{messageData.From}: {messageData.Text}");
             }
-            else //Is a PM to server msg
+            else // Is a PM to server msg
             {
                 LunaLog.Warning($"{messageData.From}: {messageData.Text}");
             }

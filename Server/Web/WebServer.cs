@@ -24,7 +24,6 @@ namespace Server.Web
     {
         private static readonly HttpServer Server = new HttpServer(new HttpRequestProvider());
         public static readonly ServerInformation ServerInformation = new ServerInformation();
-
         static WebServer() => ExitEvent.ServerClosing += StopWebServer;
 
         /// <summary>
@@ -81,9 +80,8 @@ namespace Server.Web
                 }
             }
         }
-
         /// <summary>
-        /// Starts the web server
+        /// Stops the web server
         /// </summary>
         public static void StopWebServer()
         {
@@ -99,7 +97,6 @@ namespace Server.Web
                 }
             }
         }
-
         /// <summary>
         /// Refresh the server information
         /// </summary>

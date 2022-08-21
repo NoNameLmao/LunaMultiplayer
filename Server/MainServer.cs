@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Server.DiscordBot;
 
 namespace Server
 {
@@ -128,7 +129,12 @@ namespace Server
                 Console.ReadLine(); //Avoid closing automatically
             }
         }
-
+        private static async void StartDiscordBot()
+        {
+            LunaLog.Normal("Starting Discord bot...");
+            var client = new DiscordClient();
+            await DiscordClient.StartAsync();
+        }
         private static void LoadSettingsAndGroups()
         {
             LunaLog.Debug("Loading groups...");
