@@ -7,6 +7,7 @@ using Server.Context;
 using Server.Log;
 using Server.Plugin;
 using Server.Server;
+using Server.DiscordBot;
 
 namespace Server.System
 {
@@ -38,6 +39,7 @@ namespace Server.System
                 LmpPluginHandler.FireOnClientAuthenticated(client);
 
                 LunaLog.Normal($"Client {data.PlayerName} ({data.UniqueIdentifier}) handshake successfully, Version: {data.MajorVersion}.{data.MinorVersion}.{data.BuildVersion}");
+                DiscordClient.SendMessageToDiscordAsync($"Player {data.PlayerName} joined! Currently online: {ServerContext.PlayerCount}");
 
                 HandshakeSystemSender.SendHandshakeReply(client, HandshakeReply.HandshookSuccessfully, "success");
 

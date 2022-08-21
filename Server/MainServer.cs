@@ -84,6 +84,7 @@ namespace Server
                 LmpPluginHandler.LoadPlugins();
                 WarpSystem.Reset();
                 TimeSystem.Reset();
+                StartDiscordBot();
 
                 LunaLog.Normal($"Starting '{GeneralSettings.SettingsStore.ServerName}' on Address {ConnectionSettings.SettingsStore.ListenAddress} Port {ConnectionSettings.SettingsStore.Port}... ");
 
@@ -115,12 +116,13 @@ namespace Server
                     Thread.Sleep(500);
 
                 LunaLog.Normal("All systems up and running. Поехали!");
+                DiscordClient.SendMessageToDiscordAsync(":white_check_mark: KSP Server started!");
                 LmpPluginHandler.FireOnServerStart();
 
                 QuitEvent.WaitOne();
 
                 LmpPluginHandler.FireOnServerStop();
-
+                DiscordClient.SendMessageToDiscordAsync(":x: KSP Server stopped!");
                 LunaLog.Normal("So long and thanks for all the fish!");
             }
             catch (Exception e)
@@ -132,7 +134,7 @@ namespace Server
         private static async void StartDiscordBot()
         {
             LunaLog.Normal("Starting Discord bot...");
-            var client = new DiscordClient();
+            _ = new DiscordClient();
             await DiscordClient.StartAsync();
         }
         private static void LoadSettingsAndGroups()

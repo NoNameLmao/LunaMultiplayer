@@ -7,6 +7,7 @@ using Server.Log;
 using Server.Plugin;
 using Server.Server;
 using Server.System;
+using Server.DiscordBot;
 using System;
 
 namespace Server.Client
@@ -26,15 +27,16 @@ namespace Server.Client
         public static void DisconnectClient(ClientStructure client, string reason = "")
         {
             if (!string.IsNullOrEmpty(reason))
-                LunaLog.Debug($"{client.PlayerName} sent Connection end message, reason: {reason}");
-
-            //Remove Clients from list
+            {
+                DiscordClient.SendMessageToDiscordAsync($"Player {client.PlayerName} disconnected! ({reason})");
+                LunaLog.Debug($"{client.PlayerName} sent 'Connection end' message, reason: {reason}");
+            }
+            // Remove Clients from list
             if (ServerContext.Clients.ContainsKey(client.Endpoint))
             {
                 ServerContext.Clients.TryRemove(client.Endpoint, out client);
                 LunaLog.Debug($"Online Players: {ServerContext.PlayerCount}, connected: {ServerContext.Clients.Count}");
             }
-
             if (client.ConnectionStatus != ConnectionStatus.Disconnected)
             {
                 client.ConnectionStatus = ConnectionStatus.Disconnected;

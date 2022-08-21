@@ -5,10 +5,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Server.Server;
-using LmpCommon.Message.Server;
 using Server.Context;
-using LmpCommon.Message.Data.Chat;
+using Server.Log;
 using Server.Settings.Structures;
+using LmpCommon.Message.Data.Chat;
+using LmpCommon.Message.Server;
 
 namespace Server.DiscordBot
 {
@@ -19,6 +20,7 @@ namespace Server.DiscordBot
         public async Task MainAsync()
         {
             Client.Log += Log;
+            Client.MessageReceived += MessageReceived;
             var token = File.ReadAllText("token.txt");
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
@@ -26,7 +28,7 @@ namespace Server.DiscordBot
         }
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            Console.WriteLine($"[Discord] {msg.ToString()}");
             return Task.CompletedTask;
         }
         public static async Task<SocketTextChannel> GetKSPChatChannelAsync()
@@ -39,13 +41,22 @@ namespace Server.DiscordBot
             var KspChatChannel = await GetKSPChatChannelAsync();
             return await KspChatChannel.SendMessageAsync(text);
         }
-        public static void SendMessageToKSP(RestUserMessage message)
+        public static void SendMessageToKSP(string text)
         {
             // this took me 4 hours
             var msgData = ServerContext.ServerMessageFactory.CreateNewMessageData<ChatMsgData>();
-            msgData.From = GeneralSettings.SettingsStore.ConsoleIdentifier;
-            msgData.Text = message.ToString();
+            msgData.From = "[Discord]";
+            msgData.Text = text;
             MessageQueuer.SendToAllClients<ChatSrvMsg>(msgData);
+        }
+        public static async Task MessageReceived(SocketMessage message)
+        {
+            if (message.Channel.Id == 1010603662780940299)
+            {
+                if (message.Author.Id == 1009878741285081149) return;
+                LunaLog.ChatMessage($"[Discord] {message.Author.Username}: {message}");
+                SendMessageToKSP($"{message.Author.Username}: {message}");
+            }
         }
     }
 }
